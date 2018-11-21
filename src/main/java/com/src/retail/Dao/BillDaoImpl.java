@@ -18,15 +18,19 @@ public class BillDaoImpl implements BillDao {
 
 	@Override
 	public List<Bill> getallbills() {
+		Session currentsession=sessionfactory.getCurrentSession();
 		
-		return null;
+		Query<Bill> query=currentsession.createQuery("from Bill order by 1");
+		
+		List<Bill> bills=query.getResultList();
+		
+		return bills;
 	}
 
 	@Override
 	public Bill getbill(long billid) {
 		Bill tempbill;
 		Session currentsession =sessionfactory.getCurrentSession();
-		System.out.println("Getting single bill In dao class");
 		tempbill=currentsession.get(Bill.class,billid);
 		return tempbill;
 	}
@@ -34,9 +38,9 @@ public class BillDaoImpl implements BillDao {
 	@Override
 	public void addBill(Bill bill) {
 		
-		System.out.println("Adding bill In dao class");
+		
 		Session currentsession=sessionfactory.getCurrentSession();
-		System.out.println("Adding bill via dao class");
+		
 		currentsession.saveOrUpdate(bill);
 		
 	}
@@ -45,7 +49,7 @@ public class BillDaoImpl implements BillDao {
 	public void deleteBill(long theId) {
 	
 		Session currentSession = sessionfactory.getCurrentSession();
-		System.out.println("Delete after session bill In dao class");
+		
 		
 		Bill entity = currentSession.load(Bill.class,theId);
 		currentSession.delete(entity);

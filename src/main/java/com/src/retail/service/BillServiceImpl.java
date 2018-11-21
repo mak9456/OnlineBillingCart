@@ -29,6 +29,10 @@ public  class BillServiceImpl implements BillService{
 	@Autowired
 	private CarItemDao cartitemdao;
 	
+	private static final int TAXTYPE_A=10;
+	private static final int TAXTYPE_B=20;
+	private static final int TAXTYPE_C=0;
+	
 	@Override
 	@Transactional
 	public List<Bill> getallbills() {
@@ -42,7 +46,7 @@ public  class BillServiceImpl implements BillService{
 	@Override
 	@Transactional
 	public Bill getbill(long billid) {
-		// TODO Auto-generated method stub
+	
 		Bill singleBill=billdao.getbill(billid);
 		return singleBill;
 	}
@@ -50,8 +54,6 @@ public  class BillServiceImpl implements BillService{
 	@Override
 	@Transactional
 	public void addBill(Bill newbill) {
-		// TODO Auto-generated method stub
-		System.out.println("In service addbill");
 		billdao.addBill(newbill);
 	}
 
@@ -62,27 +64,27 @@ public  class BillServiceImpl implements BillService{
 		double taxamount=0;
 		CartItem cartitemtoAdd=null;
 		Bill tempbill=billdao.getbill(billinfo.getId());
-		//fetch product by product barcode
+		
 		Product producttoadd=productdao.getProduct(billinfo.getBarcode());
 		for (CartItem cart:tempbill.getCartitem())
 		{
 			
 			if (cart.getProduct().getBarCodeId().equals(producttoadd.getBarCodeId()))
 			{	
-				System.out.println("In for loop"+cart.getProduct().getBarCodeId());
+				
 				cartitemtoAdd=cartitemdao.getCartItem(cart.getId()); 
 				
 			}
 			
 		}
 		
-		System.out.println("tempbill:"+tempbill.getBillStatus().name());
-		if(billinfo.getBillstatus().equals(BillStatus.INPROGRESS) && tempbill.getBillStatus().name().equals(BillStatus.INPROGRESS) ) {
-			System.out.println("In progeess");
+		
+		if(billinfo.getBillstatus().equals(BillStatus.INPROGRESS) && tempbill.getBillStatus().name().equals(BillStatus.INPROGRESS.name()) ) {
+			
 			tempbill.setBillStatus(BillStatus.INPROGRESS);
 			if(billinfo.getOperation().equals("ADD")) {
 				
-				//Add  product in Lineitem substract stcockitem
+				//Add  product in Cartitem substract stcockitem
 				if (cartitemtoAdd==null)
 				cartitemtoAdd=new CartItem();
 				else 
@@ -91,23 +93,22 @@ public  class BillServiceImpl implements BillService{
 				cartitemtoAdd.setProduct(producttoadd);
 				cartitemtoAdd.setQuantity(cartitemtoAdd.getQuantity()+billinfo.getQuantity());
 				
-				//Add Lineitem in Bill || Update no of items || total cost||  total tax || total  value
+				//Add Cartitem in Bill || Update no of items || total cost||  total tax || total  value
 				tempbill.addItem(cartitemtoAdd);
 				tempbill.setNoOfItems(tempbill.getNoOfItems()+billinfo.getQuantity());
 				tempbill.setTotalCost(tempbill.getTotalCost()+ billinfo.getQuantity()*producttoadd.getRate());
 				
 				if (producttoadd.getProductCategory().name().equals("A"))
-				taxamount=billinfo.getQuantity()*producttoadd.getRate()*0.1;	
+				taxamount=billinfo.getQuantity()*producttoadd.getRate()*TAXTYPE_A/100;	
 				else if (producttoadd.getProductCategory().name().equals("B"))
-				taxamount=billinfo.getQuantity()*producttoadd.getRate()*0.2;		
+				taxamount=billinfo.getQuantity()*producttoadd.getRate()*TAXTYPE_B/100;		
 									
 				
 				tempbill.setTotalTax(tempbill.getTotalTax() + taxamount);
 				tempbill.setTotalValue(tempbill.getTotalCost()+tempbill.getTotalTax());
 				
-				System.out.println("CartItem Save");
+				
 				cartitemdao.saveCartItem(cartitemtoAdd);
-				System.out.println("Bill Update");
 				billdao.addBill(tempbill);
 			}
 			else if(billinfo.getOperation().equals("REMOVE")) {
@@ -117,7 +118,7 @@ public  class BillServiceImpl implements BillService{
 				cartitemtoAdd.setProduct(producttoadd);
 				cartitemtoAdd.setQuantity(cartitemtoAdd.getQuantity()-billinfo.getQuantity());
 				
-				//Add Lineitem in Bill || Update no of items || total cost||  total tax || total  value
+				//Add Cartitem in Bill || Update no of items || total cost||  total tax || total  value
 				tempbill.addItem(cartitemtoAdd);
 				tempbill.setNoOfItems(tempbill.getNoOfItems()-billinfo.getQuantity());
 				tempbill.setTotalCost(tempbill.getTotalCost()-billinfo.getQuantity()*producttoadd.getRate());
@@ -137,7 +138,7 @@ public  class BillServiceImpl implements BillService{
 				
 			}
 		}
-		else {
+		else if (billinfo.getBillstatus().equals(BillStatus.COMPLETED)) {
 			tempbill.setBillStatus(BillStatus.COMPLETED);
 		}
 		

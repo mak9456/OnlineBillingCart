@@ -21,6 +21,7 @@ import com.src.retail.entity.BillStatus;
 import com.src.retail.entity.CartItem;
 import com.src.retail.entity.Product;
 import com.src.retail.entity.ProductCategory;
+import com.src.retail.exception.BillNotFound;
 import com.src.retail.service.BillService;
 
 @RestController
@@ -47,6 +48,9 @@ public class BillController {
 	public Bill getBill(@PathVariable long billid){
 		Bill singleBill=billservice.getbill(billid);
 		
+		if(singleBill==null|| singleBill.getId()==0)
+			throw new BillNotFound("Bill Not Found");
+		
 		return singleBill;
 	}
 	
@@ -54,7 +58,7 @@ public class BillController {
 	public Bill addBill(){
 		
 		Bill newbill=new Bill(0,0,BillStatus.INPROGRESS);
-		System.out.println("Bill:"+newbill.getId());
+		
 		billservice.addBill(newbill);
 		return newbill;
 	}
@@ -62,15 +66,16 @@ public class BillController {
 	
 	@PutMapping("/bills")
 	public Bill updateBill(@RequestBody BillUpdateInfo billinfo) {
-		System.out.println("Request object:"+billinfo.getId()+":"+billinfo.getBarcode()+":"+billinfo.getOperation());
 		Bill updatebill=billservice.updateBill(billinfo);	
 		return updatebill;
 	}
 	
 	@DeleteMapping("/bills/{billid}")
 	public Bill deleteBill(@PathVariable long billid) {
-		System.out.println("Request object:delete"+billid);
 		Bill deletedbill=billservice.getbill(billid);
+		if(deletedbill==null|| deletedbill.getId()==0)
+			throw new BillNotFound("Bill Not Found");
+		
 		billservice.deleteBill(billid);	
 		return deletedbill;
 	}
