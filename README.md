@@ -2,7 +2,7 @@
 Rest Api to generate Bill 
 
 1.To use this REST Service, clone this repo and resolve all maven dependencies.
-2.Run all the dbacript present in dbscript section of this project.
+2.Run all the dbscript present in <<dbscript>> section of this project.
 3.Use the API thorugh below mwntione operations.
 FIve endpoints of API:
 1.   /Onilne-cart/bills  -GET -to get all the bills
