@@ -1,13 +1,20 @@
 package com.src.retail.rest.controller;
 
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
+
 import com.src.retail.entity.BillStatus;
 
 public class BillUpdateInfo {
 
+	@NotNull
 	private long id;
+	
 	
 	private String operation;
 	
+	@Size(min=4 , max=30)
 	private String barcode;
 	
 	private int quantity;

@@ -2,11 +2,10 @@ package com.src.retail.exception;
 
 public class billerrorresponse {
 
-	
-
 	private int statusCode;
 	private String errorMessage;
 	private String timestamp;
+
 	public int getStatusCode() {
 		return statusCode;
 	}

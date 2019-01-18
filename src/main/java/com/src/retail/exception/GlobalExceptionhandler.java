@@ -20,4 +20,22 @@ public class GlobalExceptionhandler {
 	}
 	
 	
+	@ExceptionHandler
+	public ResponseEntity<billerrorresponse> itemRemove(ItemException ex){
+		System.out.println("In itemRemove(): "+ ex.getMessage());
+		billerrorresponse error=new billerrorresponse();
+		error.setErrorMessage(ex.getMessage());
+		error.setStatusCode(HttpStatus.NO_CONTENT.value());
+		return new ResponseEntity<>(error,HttpStatus.NO_CONTENT);
+	}
+	
+	@ExceptionHandler
+	public ResponseEntity<billerrorresponse> GenericException(Exception ex){
+		System.out.println("In GenericException(): "+ex.getMessage());
+		billerrorresponse error=new billerrorresponse();
+		error.setErrorMessage(ex.getMessage());
+		error.setStatusCode(HttpStatus.INTERNAL_SERVER_ERROR.value());
+		return new ResponseEntity<>(error,HttpStatus.INTERNAL_SERVER_ERROR);
+	}
+	
 }
